@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using TransportationAPI.Models;
 using TransportationAPI.Models.Dto.CarsDto;
+using TransportationAPI.Models.Dto.DriversDto;
 using TransportationAPI.Models.Dto.UserDto;
 
 namespace TransportationAPI.Helper
@@ -13,6 +14,8 @@ namespace TransportationAPI.Helper
             CreateMap<UserDto, IdentityUser>().ReverseMap();
             CreateMap<Car, CarDto>().ReverseMap();
             CreateMap<Car, CarUpdateDto>().ReverseMap();
+            CreateMap<Driver, DriverDto>().ReverseMap();
+            CreateMap<Driver, DriverUpdateDto>().ReverseMap();
 
 
 

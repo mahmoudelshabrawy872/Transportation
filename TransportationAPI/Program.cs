@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swasxehbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
@@ -25,6 +25,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
+
+
+
+
+builder.Services.AddCors(Option =>
+{
+    { Option.AddDefaultPolicy(builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); }); }
+});
 
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -89,7 +98,6 @@ builder.Services.AddAuthentication(a =>
 
 
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -98,6 +106,10 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
+
+
+
+app.Map("/", () => Results.Redirect("/swagger"));
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

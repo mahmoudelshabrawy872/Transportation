@@ -13,6 +13,7 @@ namespace TransportationAPI.Data
         }
         public DbSet<IdentityUser> IdentityUsers { get; set; }
         public DbSet<Car> Cars { get; set; }
+        public DbSet<Driver> Drivers { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

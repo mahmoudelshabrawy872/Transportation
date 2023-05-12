@@ -28,6 +28,8 @@ namespace TransportationAPI.Repository
             return query.ToList();
         }
 
+
+
         public async Task<T> GetAsync(Expression<Func<T, bool>>? filter = null, bool tracked = true)
         {
             IQueryable<T> query = dbSet;

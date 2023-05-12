@@ -24,6 +24,7 @@ namespace TransportationAPI.Models
         public DateTime CheckingDate { get; set; }
         [MaxLength(250)]
         public string? OwnerName { get; set; }
+        public DateTime AddedOn { get; set; } = DateTime.Now;
 
 
 

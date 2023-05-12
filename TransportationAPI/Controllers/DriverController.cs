@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TransportationAPI.Models;
-using TransportationAPI.Models.Dto.CarsDto;
+using TransportationAPI.Models.Dto.DriversDto;
 using TransportationAPI.Repository.IRepository;
 
 namespace TransportationAPI.Controllers
@@ -10,27 +10,27 @@ namespace TransportationAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize]
-    public class CarController : ControllerBase
+    public class DriverController : ControllerBase
     {
-        private readonly ICarRepository _carRepository;
+        private readonly IDriverRepository _driverRepository;
         private readonly IMapper _mapper;
         protected APIResponse _response;
 
-        public CarController(ICarRepository carRepository, IMapper mapper)
+        public DriverController(IDriverRepository driverRepository, IMapper mapper)
         {
-            _carRepository = carRepository;
+            _driverRepository = driverRepository;
             this._response = new APIResponse();
             _mapper = mapper;
         }
 
 
-        [HttpGet("GetAllCars")]
-        public async Task<ActionResult<APIResponse>> GetAllCars()
+        [HttpGet("GetAllDrivers")]
+        public async Task<ActionResult<APIResponse>> GetAllDrivers()
         {
             try
             {
-                IEnumerable<Car> cars = await _carRepository.GetAllAsync();
-                _response.Result = _mapper.Map<List<CarDto>>(cars);
+                IEnumerable<Driver> Drivers = await _driverRepository.GetAllAsync();
+                _response.Result = _mapper.Map<List<DriverDto>>(Drivers);
                 return _response;
             }
             catch (Exception e)
@@ -49,24 +49,24 @@ namespace TransportationAPI.Controllers
 
         }
 
-        [HttpGet("GetCarById")]
-        public async Task<ActionResult<APIResponse>> GetCarById(int id)
+        [HttpGet("GetDriverById")]
+        public async Task<ActionResult<APIResponse>> GetDriverById(int id)
         {
             try
             {
-                var car = await _carRepository.GetAsync(c => c.Id == id);
-                if (car is null)
+                var Driver = await _driverRepository.GetAsync(c => c.Id == id);
+                if (Driver is null)
                 {
                     _response.IsSuccess = false;
                     _response.StatusCode = HttpStatusCode.NotFound;
                     _response.ErrorMessages = new()
                     {
-                        "This Car Not Found"
+                        "This Driver Not Found"
                     };
                 }
                 else
                 {
-                    _response.Result = _mapper.Map<CarDto>(car);
+                    _response.Result = _mapper.Map<DriverDto>(Driver);
                 }
             }
             catch (Exception e)
@@ -82,60 +82,15 @@ namespace TransportationAPI.Controllers
             return _response;
         }
 
-        [HttpGet("SearchOnCars")]
-        public async Task<ActionResult<APIResponse>> SearchOnCars(string searchKey)
+        [HttpPost("CreateDriver")]
+        public async Task<ActionResult<APIResponse>> CreateDriver([FromQuery] DriverDto dto)
         {
+            Driver Driver = _mapper.Map<Driver>(dto);
             try
             {
+                await _driverRepository.CreateAsync(Driver);
 
-                var car = await _carRepository.GetAllAsync(c =>
-                    c.Model.ToLower().Contains(searchKey.ToLower()) ||
-                    c.FramNumber.ToLower().Contains(searchKey.ToLower()) ||
-                    c.Color.ToLower().Contains(searchKey.ToLower()) ||
-                    c.Name.ToLower().Contains(searchKey.ToLower()) ||
-                    c.MoterNumber.ToLower().Contains(searchKey.ToLower()) ||
-                    c.PlateNumber.ToLower().Contains(searchKey.ToLower()) ||
-                    c.OwnerName.ToLower().Contains(searchKey.ToLower()) ||
-                    c.Kind.ToLower().Contains(searchKey.ToLower())
-                );
-                if (car is null || !car.Any())
-                {
-                    _response.IsSuccess = false;
-                    _response.StatusCode = HttpStatusCode.NotFound;
-                    _response.ErrorMessages = new()
-                    {
-                        "This search Key Not Found"
-                    };
-                    return _response;
-                }
-                else
-                {
-                    _response.Result = _mapper.Map<List<CarDto>>(car);
-                }
-            }
-            catch (Exception e)
-            {
-                _response.Result = null;
-                _response.IsSuccess = false;
-                _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.ErrorMessages = new()
-                {
-                    e.ToString()
-                };
-            }
-            return _response;
-        }
-
-
-        [HttpPost("CreateCar")]
-        public async Task<ActionResult<APIResponse>> CreateCar([FromQuery] CarDto dto)
-        {
-            Car car = _mapper.Map<Car>(dto);
-            try
-            {
-                await _carRepository.CreateAsync(car);
-
-                _response.Result = car;
+                _response.Result = Driver;
 
             }
             catch (Exception e)
@@ -152,13 +107,13 @@ namespace TransportationAPI.Controllers
 
         }
 
-        [HttpDelete("DeleteCarById")]
-        public async Task<ActionResult<APIResponse>> DeleteCarById(int id)
+        [HttpDelete("DeleteDriverById")]
+        public async Task<ActionResult<APIResponse>> DeleteDriverById(int id)
         {
 
 
-            var car = await _carRepository.GetAsync(c => c.Id == id);
-            if (car is null)
+            var Driver = await _driverRepository.GetAsync(c => c.Id == id);
+            if (Driver is null)
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.BadRequest;
@@ -171,7 +126,7 @@ namespace TransportationAPI.Controllers
             try
             {
 
-                await _carRepository.DeleteAsync(car);
+                await _driverRepository.DeleteAsync(Driver);
                 bool IsDeleted = true;
                 _response.Result = IsDeleted;
 
@@ -191,27 +146,27 @@ namespace TransportationAPI.Controllers
 
         }
 
-        [HttpPut("UpdateCarById")]
-        public async Task<ActionResult<APIResponse>> UpdateCarById([FromBody] CarUpdateDto dto)
+        [HttpPut("UpdateDriverById")]
+        public async Task<ActionResult<APIResponse>> UpdateDriverById([FromBody] DriverUpdateDto dto)
         {
 
-            var car = await _carRepository.GetAsync(c => c.Id == dto.Id, false);
-            if (car is null)
+            var Driver = await _driverRepository.GetAsync(c => c.Id == dto.Id, false);
+            if (Driver is null)
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.ErrorMessages = new()
                 {
-                    "This Car Is Not Find"
+                    "This Driver Is Not Find"
                 };
                 return _response;
             }
 
             try
             {
-                Car resultCar = _mapper.Map<Car>(dto);
-                await _carRepository.UpdateCarAsync(resultCar);
-                _response.Result = resultCar;
+                Driver resultDriver = _mapper.Map<Driver>(dto);
+                await _driverRepository.UpdateDriverAsync(resultDriver);
+                _response.Result = resultDriver;
 
             }
             catch (Exception e)
