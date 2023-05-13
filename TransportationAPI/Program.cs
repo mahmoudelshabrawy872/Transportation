@@ -30,10 +30,6 @@ builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 
 
 
-builder.Services.AddCors(Option =>
-{
-    { Option.AddDefaultPolicy(builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); }); }
-});
 
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -95,7 +91,12 @@ builder.Services.AddAuthentication(a =>
 });
 
 
-
+#region Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+#endregion
 
 
 var app = builder.Build();
@@ -108,11 +109,14 @@ app.UseSwaggerUI();
 //}
 
 
-
+app.UseCors(policyName: "CorsPolicy");
 app.Map("/", () => Results.Redirect("/swagger"));
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+
+
 
 app.MapControllers();
 
